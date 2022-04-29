@@ -113,7 +113,7 @@ atComm::~atComm()
         //Message length skipped for now
         *(id_t*)(&m_dataBuffer[SOURCE_ID_POS]) = sourceId;
         *(id_t*)(&m_dataBuffer[DESTINATION_ID_POS]) = destId;
-        *(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) = 0;
+        *(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) = 0;
         // Data count skipped for now
 
         m_writePtr = DATA_START_POS; // ready to write data
@@ -121,39 +121,49 @@ atComm::~atComm()
         return m_writePtr;
     }
 
-    int atComm::addACKRequest()
+    int atComm::setACKRequest()
 	{
     	if(m_lockStatus){
 			return ATCOMM_ERROR_BUFFER_LOCKED;
 		}
 
 	  //Message length skipped for now
-	  *(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) |=  MESSAGE_ACK_REQUEST << 2;
+	  *(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) |=  ATCOM_ACK_REQUEST;
 	  // Data count skipped for now
 
 	  return ATCOMM_SUCCESS;
 	}
 
-    int atComm::addACKStatus()
+    int atComm::setACKStatus()
     {
     	if(m_lockStatus){
 			return ATCOMM_ERROR_BUFFER_LOCKED;
 		}
 
-    	*(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) |=  MESSAGE_ACK;
+    	*(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) |=  ATCOM_ACK;
 
     	return ATCOMM_SUCCESS;
     }
 
-    int atComm::addNACKStatus()
+    int atComm::setNACKStatus()
    {
     	if(m_lockStatus){
     				return ATCOMM_ERROR_BUFFER_LOCKED;
     			}
-    	*(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) |=  MESSAGE_NACK;
+    	*(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) |=  ATCOM_NACK;
 
     	return ATCOMM_SUCCESS;
    }
+
+    int atComm::setLastPacketStatus()
+    {
+    	if(m_lockStatus){
+    				return ATCOMM_ERROR_BUFFER_LOCKED;
+    			}
+    	*(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) |=  ATCOM_LAST_PACKET;
+
+    	return ATCOMM_SUCCESS;
+    }
 
 
     // buffer transmission functions
@@ -249,14 +259,14 @@ atComm::~atComm()
     int atComm::generateAckMessage(id_t sourceId, id_t destId)
     {
     	startNewMessage(sourceId, destId);
-    	addACKStatus();
+    	setACKStatus();
     	return completeMessage();
     }
 
     int atComm::generateNackMessage(id_t sourceId, id_t destId)
     {
     	startNewMessage(sourceId, destId);
-    	addNACKStatus();
+    	setNACKStatus();
     	return completeMessage();
     }
 
@@ -497,12 +507,17 @@ crc_t atComm::calculateCRC(uint8_t *data_blk_ptr, uint16_t data_blk_size)
 
  messageType_t atComm::getAckStatus()
  {
-     return *(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) & 0b00000011;
+     return *(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) & 0b00000011;
  }
 
- messageType_t atComm::getAckRequest()
+ bool atComm::getAckRequest()
  {
-	 return *(messageType_t*)(&m_dataBuffer[MESSAGE_TYPE_POS]) & 0b00000100;
+	 return *(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) & ATCOM_ACK_REQUEST;
+ }
+
+ bool atComm::getLastPacketStatus()
+ {
+	 return *(messageType_t*)(&m_dataBuffer[PACKET_INFO_POS]) & ATCOM_LAST_PACKET;
  }
 
  int atComm::findHeaderPosition(uint8_t* buffer, int maxLen)

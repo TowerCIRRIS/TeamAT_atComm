@@ -63,9 +63,9 @@ typedef struct
 #define SOURCE_ID_LEN       sizeof(id_t)
 #define DESTINATION_ID_POS  (SOURCE_ID_POS + SOURCE_ID_LEN)
 #define DESTINATION_ID_LEN  sizeof(id_t)
-#define MESSAGE_TYPE_POS	(DESTINATION_ID_POS + DESTINATION_ID_LEN)
-#define MESSAGE_TYPE_LEN	sizeof(messageType_t)
-#define DATA_COUNT_POS		(MESSAGE_TYPE_POS + MESSAGE_TYPE_LEN)
+#define PACKET_INFO_POS		(DESTINATION_ID_POS + DESTINATION_ID_LEN)
+#define PACKET_INFO_LEN		sizeof(messageType_t)
+#define DATA_COUNT_POS		(PACKET_INFO_POS + PACKET_INFO_LEN)
 #define DATA_COUNT_LEN      sizeof(dataCount_t)//2
 #define DATA_START_POS      (DATA_COUNT_POS + DATA_COUNT_LEN)
 
@@ -81,13 +81,16 @@ typedef struct
 // [b2]				ack request
 // [b1 b0]			Ack status
 
-#define MESSAGE_ACK 			0b01
-#define MESSAGE_NACK			0b10
-#define MESSAGE_ACK_REQUEST 	0b1
+#define ATCOM_ACK 					0b01000000
+#define ATCOM_NACK					0b10000000
+#define ATCOM_ACK_REQUEST 			0b00100000
+#define ATCOM_LAST_PACKET			0b00010000
 
-#define MESSAGE_TYPE_UNDEFINED	0x00
-#define MESSAGE_TYPE_ACK_ONLY	0x01
-#define MESSAGE_TYPE_DATA		0x02
+#define PACKET_INFO_TYPE_UNDEFINED	0x00
+//#define PACKET_INFO_TYPE_ACK_ONLY	0x01
+//#define PACKET_INFO_TYPE_DATA		0x02
+//#define PACKET_INFO_FIRST_PACKET	0x03
+//#define PACKET_INFO_LAST_PACKET		0x04
 
 //DATA packet 
 #define DATA_TYPE_POS       0
@@ -146,9 +149,10 @@ class atComm
 
         // buffer transmission functions
         int startNewMessage(id_t sourceId, id_t destId);    //done
-        int addACKRequest(); //TODO test
-        int addACKStatus(); //TODO test
-        int addNACKStatus(); //TODO test
+        int setACKRequest(); //TODO test
+        int setACKStatus(); //TODO test
+        int setNACKStatus(); //TODO test
+        int setLastPacketStatus(); //TODO test
         int addData(dataType_t dataType, dataLenght_t dataLen, void* dataPtr ); //done
         int completeMessage();   //done
         int getSendPacket(uint8_t* buffer, uint32_t maxLen);
@@ -170,7 +174,8 @@ class atComm
         id_t getSourceId();         //done
         id_t getDestinationId();    //done
         messageType_t getAckStatus(); 	//TODO test
-        messageType_t getAckRequest(); 	//TODO test
+        bool getAckRequest(); 	//TODO test
+        bool getLastPacketStatus();
 
         //External tools to facilitate integration
         int findHeaderPosition(uint8_t* buffer, int maxLen); //
