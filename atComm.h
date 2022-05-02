@@ -15,7 +15,7 @@
 
 #include "stdint.h"
 
-#define __UNIT_TEST__
+//#define __UNIT_TEST__
 
 
 #ifdef __UNIT_TEST__
@@ -28,8 +28,8 @@
 
 
 
-typedef uint8_t id_t;
-typedef uint8_t messageType_t;
+typedef uint8_t atCommId_t;
+typedef uint8_t atCommPaquetInfo_t;
 
 typedef uint16_t dataCount_t;
 typedef uint16_t messageLen_t;
@@ -60,11 +60,11 @@ typedef struct
 #define MESSAGE_LENGTH_LEN     sizeof(messageLen_t)//2
 
 #define SOURCE_ID_POS       (MESSAGE_LENGTH_POS + MESSAGE_LENGTH_LEN)
-#define SOURCE_ID_LEN       sizeof(id_t)
+#define SOURCE_ID_LEN       sizeof(atCommId_t)
 #define DESTINATION_ID_POS  (SOURCE_ID_POS + SOURCE_ID_LEN)
-#define DESTINATION_ID_LEN  sizeof(id_t)
+#define DESTINATION_ID_LEN  sizeof(atCommId_t)
 #define PACKET_INFO_POS		(DESTINATION_ID_POS + DESTINATION_ID_LEN)
-#define PACKET_INFO_LEN		sizeof(messageType_t)
+#define PACKET_INFO_LEN		sizeof(atCommPaquetInfo_t)
 #define DATA_COUNT_POS		(PACKET_INFO_POS + PACKET_INFO_LEN)
 #define DATA_COUNT_LEN      sizeof(dataCount_t)//2
 #define DATA_START_POS      (DATA_COUNT_POS + DATA_COUNT_LEN)
@@ -148,7 +148,7 @@ class atComm
         
 
         // buffer transmission functions
-        int startNewMessage(id_t sourceId, id_t destId);    //done
+        int startNewMessage(atCommId_t sourceId, atCommId_t destId);    //done
         int setACKRequest(); //TODO test
         int setACKStatus(); //TODO test
         int setNACKStatus(); //TODO test
@@ -159,8 +159,8 @@ class atComm
         int getBufferLength();
 
         // Shortcut functions
-        int generateAckMessage(id_t sourceId, id_t destId);
-        int generateNackMessage(id_t sourceId, id_t destId);
+        int generateAckMessage(atCommId_t sourceId, atCommId_t destId);
+        int generateNackMessage(atCommId_t sourceId, atCommId_t destId);
 
         // buffer reception tools
         int addReceivedBytes(const uint8_t* buffer, int dataLen);
@@ -171,9 +171,9 @@ class atComm
         int gatDataInfo(dataCount_t dataNumber, dataInfo_t* dataInfo); // done
         int getData(dataInfo_t dataInfo, void* buffer,int maxLen);      //done
 
-        id_t getSourceId();         //done
-        id_t getDestinationId();    //done
-        messageType_t getAckStatus(); 	//TODO test
+        atCommId_t getSourceId();         //done
+        atCommId_t getDestinationId();    //done
+        atCommPaquetInfo_t getAckStatus(); 	//TODO test
         bool getAckRequest(); 	//TODO test
         bool getLastPacketStatus();
 
