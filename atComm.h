@@ -165,7 +165,7 @@ class atComm
         // buffer reception tools
         int addReceivedBytes(const uint8_t* buffer, int dataLen);
         //int validHeaderPresent();   
-        bool dataAvailable();
+        bool packetIsComplete();
 
         int getDataCount();
         int getDataInfo(dataCount_t dataNumber, dataInfo_t* dataInfo); // done

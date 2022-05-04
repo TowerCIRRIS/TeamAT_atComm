@@ -374,7 +374,7 @@ atComm::~atComm()
         
     }
 
-    bool atComm::dataAvailable()
+    bool atComm::packetIsComplete()
     {
         return m_packetComplete;
     }
