@@ -440,6 +440,33 @@ atComm::~atComm()
         return tempDataInfo.dataLen;
     }
 
+    int atComm::getData(dataCount_t dataNumber, void* buffer,int maxLen)      //done
+    {
+
+        dataInfo_t tempDataInfo;
+
+        int status = getDataInfo(dataNumber, &tempDataInfo);
+        if(status < 0)
+        {
+        	return status;
+        }
+//         tempDataInfo.dataType = *(dataType_t*)(&m_dataBuffer[dataInfo.dataIndex]);
+//         tempDataInfo.dataLen = *(dataLenght_t*)(&m_dataBuffer[dataInfo.dataIndex+DATA_LENGTH_POS]);
+
+        if(tempDataInfo.dataLen > maxLen)
+        {
+            return ATCOMM_ERROR_NO_ENOUGH_SPACE;
+        }
+
+        for (int i = 0; i < tempDataInfo.dataLen; i++)
+        {
+            ((uint8_t*)buffer)[i] = m_dataBuffer[tempDataInfo.dataIndex + DATA_DATA_POS + i];
+        }
+
+        return tempDataInfo.dataLen;
+
+    }
+
 
 crc_t atComm::calculateCRC(uint8_t *data_blk_ptr, uint16_t data_blk_size)
 {

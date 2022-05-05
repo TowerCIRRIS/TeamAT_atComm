@@ -170,6 +170,7 @@ class atComm
         int getDataCount();
         int getDataInfo(dataCount_t dataNumber, dataInfo_t* dataInfo); // done
         int getData(dataInfo_t dataInfo, void* buffer,int maxLen);      //done
+        int getData(dataCount_t dataNumber, void* buffer,int maxLen);      //done
 
         atCommId_t getSourceId();         //done
         atCommId_t getDestinationId();    //done
