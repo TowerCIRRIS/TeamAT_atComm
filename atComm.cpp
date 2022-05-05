@@ -311,13 +311,14 @@ atComm::~atComm()
                 {
                     // Message lenght received so we know the expected lenght now
                     m_expectedMessageLen =  *(messageLen_t*)&m_dataBuffer[m_writePtr - MESSAGE_LENGTH_LEN] + OVERHEAD_LEN;
-                }else
-                if(m_writePtr == m_expectedMessageLen )
+                }
+                else if(m_writePtr == m_expectedMessageLen )
                 {
-                        // complete message received, tiem to validate;
+                        // complete message received, time to validate;
                         if( ATCOMM_SUCCESS != validateData())
                         {
                             resetBuffer();
+                            return ATCOMM_ERROR_PACKAGE_CORRUPTED;
                         }
                 }
             }
